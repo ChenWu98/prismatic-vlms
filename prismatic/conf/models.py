@@ -8,6 +8,7 @@ variant thereof. A given model variant configures the following attributes:
     - [Optional] Stage 1 (`align`) Optimization Hyperparameters
     - Stage 2 (`finetune`) Optimization Hyperparameters
 """
+
 from dataclasses import dataclass
 from enum import Enum, unique
 from typing import Optional
@@ -258,6 +259,37 @@ class Exp_13B_Llama2(Exp_13B_One_Stage):
     llm_backbone_id: str = "llama2-13b-pure"
 
 
+# ~ Additional LLM Backbones :: LLaMa-2 Chat, Mistral v0.1, Mistral v0.1 Instruct, Phi-2 ~
+@dataclass
+class Ext_Exp_7B_Llama2_Chat(Exp_7B_One_Stage):
+    model_id: str = "llama2-chat+7b"
+    llm_backbone_id: str = "llama2-7b-chat"
+
+
+@dataclass
+class Ext_Exp_13B_Llama2_Chat(Exp_13B_One_Stage):
+    model_id: str = "llama2-chat+13b"
+    llm_backbone_id: str = "llama2-13b-chat"
+
+
+@dataclass
+class Ext_Exp_7B_Mistral_V1(Exp_7B_One_Stage):
+    model_id: str = "mistral-v0.1+7b"
+    llm_backbone_id: str = "mistral-v0.1-7b-pure"
+
+
+@dataclass
+class Ext_Exp_7B_Mistral_Instruct_V1(Exp_7B_One_Stage):
+    model_id: str = "mistral-instruct-v0.1+7b"
+    llm_backbone_id: str = "mistral-v0.1-7b-instruct"
+
+
+@dataclass
+class Ext_Exp_3B_Phi_2(Exp_7B_One_Stage):
+    model_id: str = "phi-2+3b"
+    llm_backbone_id: str = "phi-2-3b"
+
+
 # Section 4.3B :: ✌️ --> Co-training on Language-only Data
 #   =>> Note :: Run with `--dataset.type "llava-multimodal" (multimodal data only / no co-training)
 @dataclass
@@ -436,6 +468,27 @@ class Prism_13B_DINOSigLIP(Exp_13B_One_Stage):
     finetune_epochs: int = 2
 
 
+# [Inference-Optimized] 224px Prism Models
+@dataclass
+class Prism_7B_DINOSigLIP_224px_Controlled(Exp_7B_One_Stage):
+    model_id: str = "prism-dinosiglip-224px-controlled+7b"
+    vision_backbone_id: str = "dinosiglip-vit-so-224px"
+    image_resize_strategy: str = "resize-naive"
+    llm_backbone_id: str = "llama2-7b-pure"
+    arch_specifier: str = "no-align+fused-gelu-mlp"
+
+
+#   =>> Note :: Run with `--dataset.type "llava-lvis4v-lrv"`
+@dataclass
+class Prism_7B_DINOSigLIP_224px(Exp_7B_One_Stage):
+    model_id: str = "prism-dinosiglip-224px+7b"
+    vision_backbone_id: str = "dinosiglip-vit-so-224px"
+    image_resize_strategy: str = "resize-naive"
+    llm_backbone_id: str = "llama2-7b-pure"
+    arch_specifier: str = "no-align+fused-gelu-mlp"
+    finetune_epochs: int = 2
+
+
 # === Define a Model Registry Enum for Reference & Validation ===
 @unique
 class ModelRegistry(Enum):
@@ -471,6 +524,15 @@ class ModelRegistry(Enum):
     EXP_LLAMA2_7B = Exp_7B_Llama2
     EXP_LLAMA2_13B = Exp_13B_Llama2
 
+    # ~ Additional LLM Backbone Experiments :: LLaMa-2 Chat, Mistral v0.1, Mistral v0.1 Instruct, Phi-2 ~
+    EXT_EXP_LLAMA2_CHAT_7B = Ext_Exp_7B_Llama2_Chat
+    EXT_EXP_LLAMA2_CHAT_13B = Ext_Exp_13B_Llama2_Chat
+    EXT_EXP_MISTRAL_V1_7B = Ext_Exp_7B_Mistral_V1
+    EXT_EXP_MISTRAL_INSTRUCT_V1_7B = Ext_Exp_7B_Mistral_Instruct_V1
+    EXT_EXP_PHI_2_3B = Ext_Exp_3B_Phi_2
+
+    # Cotraining w/ Unimodal Data
+
     EXP_VICUNA_NO_COTRAINING_7B = Exp_7B_Vicuna_No_Cotraining
     EXP_LLAMA2_NO_COTRAINING_7B = Exp_7B_Llama2_No_Cotraining
 
@@ -499,6 +561,10 @@ class ModelRegistry(Enum):
     PRISM_DINOSIGLIP_CONTROLLED_13B = Prism_13B_DINOSigLIP_Controlled
     PRISM_DINOSIGLIP_7B = Prism_7B_DINOSigLIP
     PRISM_DINOSIGLIP_13B = Prism_13B_DINOSigLIP
+
+    # === Inference Optimized :: 224px Prism Models ===
+    PRISM_DINOSIGLIP_224PX_CONTROLLED_7B = Prism_7B_DINOSigLIP_224px_Controlled
+    PRISM_DINOSIGLIP_224PX_7B = Prism_7B_DINOSigLIP_224px
 
     @property
     def model_id(self) -> str:
